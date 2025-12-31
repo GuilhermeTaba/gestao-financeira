@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import './cadastro.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
+const API_URL = import.meta.env.VITE_API_URL
 export default function Cadastro() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -16,7 +19,7 @@ export default function Cadastro() {
     return emailRegex.test(email);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     setError('');
     
@@ -51,20 +54,14 @@ export default function Cadastro() {
     }
 
     setLoading(true);
-    
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      setNome('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
+    try {
+      const response = await axios.post(`${API_URL}/registro`, {nome:nome, email:email,senha:password})
+      const alerta = response.data.message;
+      alert(alerta)
+    } catch (error) {
+      console.log(error)
       
-      // Reseta a mensagem de sucesso após 5 segundos
-      setTimeout(() => {
-        setSuccess(false);
-      }, 5000);
-    }, 1500);
+    }
   };
 
   return (

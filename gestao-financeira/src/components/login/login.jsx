@@ -1,20 +1,39 @@
 import React, { useState } from 'react';
+import { Link, useNavigate} from 'react-router-dom';
+import axios from 'axios';
 import './login.css';
-import { Link } from 'react-router-dom';
+
+const API_URL= import.meta.env.VITE_API_URL;
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert(isLogin ? 'Login realizado!' : 'Cadastro realizado!');
-    }, 1500);
+    try {
+      console.log(API_URL)
+      console.log(`${API_URL}/login`)
+      const response = await axios.post(`${API_URL}/login`, { email: email, senha: password });
+      console.log('Resposta axios:', response);
+
+      const token = response.data?.access_token || response.data?.token;
+      if (!token) {
+        alert(response.data?.error || 'Não foi possível entrar. Verifique credenciais.');
+        return;
+      }
+
+      // salva corretamente
+      localStorage.setItem('token', token);
+      navigate('/dashboard');
+    }catch(e){console.log(e)}
+
+
   };
 
   return (
